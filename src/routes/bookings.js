@@ -11,13 +11,10 @@ const router = express.Router();
 
 router.get("/", async (req, res, next) => {
   try {
-    const { userId, propertyId } = req.query;
-    console.log(`GET bookings: userId=${userId}, propertyId=${propertyId}`); // Debug input
-    const bookings = await getBookings(userId, propertyId);
-    console.log("Bookings retrieved:", bookings); // Debug output
-    res.status(200).json(bookings);
+    const { userId } = req.query;
+    const bookings = await getBookings(userId);
+    return res.json(bookings);
   } catch (err) {
-    console.error("Error retrieving bookings:", err); // Debug error
     next(err);
   }
 });
@@ -99,8 +96,6 @@ router.put("/:id", auth, async (req, res, next) => {
     totalPrice,
     bookingStatus,
   } = req.body;
-  console.log(`PUT update booking id=${id} with data:`, req.body); // Debug input
-
   try {
     const updatedBooking = await updateBookingById(
       id,
@@ -112,21 +107,13 @@ router.put("/:id", auth, async (req, res, next) => {
       totalPrice,
       bookingStatus
     );
-    console.log("Booking update result:", updatedBooking); // Debug output
-
     if (!updatedBooking) {
-      console.log(`Booking with id ${id} was not found for update.`);
-      return res.status(404).send({
-        message: `Booking with id ${id} was not found`,
-      });
+      res.status(404).json(updatedBooking);
     } else {
-      return res.status(200).send({
-        message: `Booking with id ${id} successfully updated`,
-        booking: updatedBooking,
-      });
+      res.status(200).json(updatedBooking);
     }
-  } catch (err) {
-    next(err);
+  } catch (error) {
+    next(error);
   }
 });
 

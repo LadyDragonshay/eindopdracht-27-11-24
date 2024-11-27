@@ -1,26 +1,21 @@
 import { PrismaClient } from "@prisma/client";
 
-const updateAmenityById = async (id, name) => {
-  const prisma = new PrismaClient();
+const prisma = new PrismaClient();
+
+const updateAmenityById = async (id, data) => {
   try {
     const amenity = await prisma.amenity.update({
       where: { id },
-      data: {
-        name,
-      },
+      data,
     });
-
-    if (!amenity) {
-      return null;
-    }
-
-    amenity.name = name ?? amenity.name;
-
     return amenity;
   } catch (error) {
-    return null;
-  } finally {
-    await prisma.$disconnect();
+    if (error.code === "P2025") {
+      return null; // Record not found
+    }
+    console.error("Error updating amenity:", error);
+    throw error; // Re-throw unexpected errors
   }
 };
+
 export default updateAmenityById;

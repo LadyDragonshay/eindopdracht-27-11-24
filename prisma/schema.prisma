@@ -16,13 +16,11 @@ model Host {
   phoneNumber    String
   profilePicture String
   aboutMe        String
-  //relation
   properties     Property[]
 }
 
 model Property {
   id            String    @id @default(uuid())
-  hostId        String
   title         String
   description   String
   location      String
@@ -31,52 +29,43 @@ model Property {
   bathRoomCount Int
   maxGuestCount Int
   rating        Float
-  //relations
   bookings      Booking[]
   amenities     Amenity[]
   reviews       Review[]
-  //relation has one host
-  host          Host    @relation(fields: [hostId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   
-  @@index([hostId])
+  host          Host    @relation(fields: [hostId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  hostId        String
 }
 
 model Amenity {
   id         String   @id @default(uuid())
   name       String
-  //relation
   properties Property[]
 }
 
 model Booking {
   id             String   @id @default(uuid())
-  userId         String
-  propertyId     String
   checkinDate    DateTime
   checkoutDate   DateTime
   numberOfGuests Int
   totalPrice     Float
   bookingStatus  String
-  //relations
-  property       Property @relation(fields: [propertyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  
-  @@index([propertyId])
-  @@index([userId])
+
+  property       Property? @relation(fields: [propertyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  propertyId     String
+  user           User?     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId         String
 }
 
 model Review {
   id         String   @id @default(uuid())
-  userId     String
-  propertyId String
   rating     Int
   comment    String
-  //relations
-  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   
-  @@index([propertyId])
-  @@index([userId])
+  property   Property? @relation(fields: [propertyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  propertyId String
+  user       User?     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId     String
 }
 
 model User {
@@ -87,7 +76,6 @@ model User {
   email          String    
   phoneNumber    String
   profilePicture String
-  //relations
   bookings       Booking[]
   reviews        Review[]
 }

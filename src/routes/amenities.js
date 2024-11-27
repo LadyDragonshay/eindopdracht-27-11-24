@@ -61,26 +61,27 @@ router.post("/", auth, async (req, res, next) => {
 });
 
 router.put("/:id", auth, async (req, res, next) => {
-  const { id } = req.params;
-  const { name } = req.body;
-  console.log(`PUT request received for id: ${id}, name: ${name}`); // Debug input
   try {
-    const updatedAmenity = await updateAmenityById(id, name);
-    console.log("Amenity update result:", updatedAmenity); // Debug output
-    if (!updatedAmenity) {
-      console.log(`Amenity with id ${id} was not found for update.`);
-      res.status(404).send({
+    const { id } = req.params;
+    const { name } = req.body;
+
+    if (!name) {
+      return res.status(400).json({ message: "Name is required" });
+    }
+
+    const amenity = await updateAmenityById(id, { name });
+
+    if (!amenity) {
+      return res.status(404).json({
         message: `Amenity with id ${id} was not found`,
-        amenity: updatedAmenity,
-      });
-    } else {
-      res.status(200).send({
-        message: `Amenity with id ${id} successfully updated`,
       });
     }
-  } catch (error) {
-    console.error("Error updating amenity:", error); // Debug error
-    next(error);
+
+    res.status(200).json({
+      message: `Amenity with id ${id} successfully updated`,
+    });
+  } catch (err) {
+    next(err);
   }
 });
 

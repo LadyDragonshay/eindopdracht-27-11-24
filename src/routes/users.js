@@ -110,27 +110,21 @@ router.put("/:id", auth, async (req, res, next) => {
 });
 
 router.delete("/:id", auth, async (req, res, next) => {
-  console.log("DELETE /users/:id - Request received:", { params: req.params });
   try {
     const { id } = req.params;
-    const deletedUser = await deleteUserById(id);
-    console.log("User deletion result:", deletedUser ? "Success" : "Not Found");
+    const user = await deleteUserById(id);
 
-    if (deletedUser) {
-      console.log(`User ${id} successfully deleted`);
-      res.status(200).send({
-        message: `User with id ${id} successfully deleted`,
-        user: deletedUser,
+    if (!user || user.count === 0) {
+      res.status(404).json({
+        message: `User with id ${id} was not found`,
       });
     } else {
-      console.log(`Deletion failed - User ${id} not found`);
-      res.status(404).json({
-        message: `User with id ${id} not found`,
+      res.status(200).send({
+        message: `User with id ${id} successfully deleted`,
       });
     }
-  } catch (error) {
-    console.error(`Error deleting user ${req.params.id}:`, error);
-    next(error);
+  } catch (err) {
+    next(err);
   }
 });
 
